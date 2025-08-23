@@ -1,0 +1,9 @@
+[package]
+name = "upscale_image_chunk"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.45", features = ["derive"] }
+image = "0.25.6"
+rayon = "1.11.0"
