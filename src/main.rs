@@ -20,13 +20,14 @@ struct Args {
     #[arg(short, long, default_value = "out.png")]
     output: String,
 
-    /// Minimum length of the cropped image. UIC will resize the image to this size before comparisons.
+    /// Minimum length of the cropped image (default = min side of cropped image).
     #[arg(short, long)]
-    min_length: u32,
+    min_length: Option<u32>,
 
-    /// Stop comparisons once the cropped chunk is this size
+    /// Stop comparisons once the cropped chunk is this size 
+    /// (default = maximum size before chunk touches full image edge).
     #[arg(short, long)]
-    stop_at: u32,
+    stop_at: Option<u32>,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -38,6 +39,37 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (orig_w, orig_h) = chunk_orig.dimensions();
     let aspect_ratio = orig_w as f32 / orig_h as f32;
 
+    // Defaults for min_length and stop_at if not provided
+    let min_length = args.min_length.unwrap_or(orig_w.min(orig_h));
+
+    let stop_at = args.stop_at.unwrap_or_else(|| {
+        if aspect_ratio >= 1.0 {
+            let max_w = full_w;
+            let max_h = (max_w as f32 / aspect_ratio).round() as u32;
+            if max_h > full_h {
+                // limit by height
+                full_h
+            } else {
+                // limit by width
+                max_w
+            }
+        } else {
+            let max_h = full_h;
+            let max_w = (max_h as f32 * aspect_ratio).round() as u32;
+            if max_w > full_w {
+                // limit by width
+                full_w
+            } else {
+                // limit by height
+                max_h
+            }
+        }
+    });
+
+    println!("cropfit");
+    println!();
+    println!("Using min_length={}, stop_at={}", min_length, stop_at);
+
     let _ctx = cust::quick_init()?;
     let ptx = include_str!("ssd_kernel.ptx"); 
     let module = Module::from_ptx(ptx, &[])?;
@@ -46,11 +78,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut best_score = f64::MAX;
     let mut best_coords = (0, 0, 0, 0);
 
-    let total_sizes = args.stop_at - args.min_length + 1;
+    let total_sizes = stop_at - min_length + 1;
     let start_time = Instant::now();
 
-    let mut size = args.min_length;
-    while size <= args.stop_at {
+    let mut size = min_length;
+    while size <= stop_at {
         let iter_start = Instant::now();
 
         let (chunk_w, chunk_h) = if aspect_ratio >= 1.0 {
@@ -106,7 +138,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         let iter_elapsed = iter_start.elapsed().as_secs_f64();
-        let completed = size - args.min_length + 1;
+        let completed = size - min_length + 1;
         let remaining = total_sizes - completed;
         let est_remaining_time = remaining as f64 * iter_elapsed;
 

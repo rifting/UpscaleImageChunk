@@ -271,6 +271,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cropfit"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "cust",
+ "image",
+ "rayon",
+]
+
+[[package]]
 name = "crossbeam-deque"
 version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1141,16 +1151,6 @@ name = "unicode-ident"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a5f39404a5da50712a4c1eecf25e90dd62b613502b7e925fd4e4d19b5c96512"
-
-[[package]]
-name = "upscale_image_chunk"
-version = "0.1.0"
-dependencies = [
- "clap",
- "cust",
- "image",
- "rayon",
-]
 
 [[package]]
 name = "utf8parse"

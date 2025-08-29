@@ -1,19 +1,20 @@
-# UpscaleImageChunk
-\- now with GPU!!!!
+# cropfit
+For when you need to get the highest quality version of a cropped image.
+The main reason I built this is for recovering old profile pictures when you only have a low quality version.
 
-A project I made to upscale low quality crops of images, provided you have the original.
+Requires a GPU to run!
 
 ## Using
 
 ```
-Usage: upscale_image_chunk.exe [OPTIONS] --cropped-image <CROPPED_IMAGE> --full-image <FULL_IMAGE> --min-length <MIN_LENGTH> --stop-at <STOP_AT>
+Usage: ./cropfit [OPTIONS] --cropped-image <CROPPED_IMAGE> --full-image <FULL_IMAGE>
 
 Options:
   -c, --cropped-image <CROPPED_IMAGE>  Cropped image / Chunk from the original image
   -f, --full-image <FULL_IMAGE>        Full image
   -o, --output <OUTPUT>                Output file [default: out.png]
-  -m, --min-length <MIN_LENGTH>        Minimum size of the cropped image's longest edge. UIC will resize the image before comparisons
-  -s, --stop-at <STOP_AT>              Stop comparisons once the cropped chunk's longest edge is this size
+  -m, --min-length <MIN_LENGTH>        Minimum length of the cropped image (default = min side of cropped image)
+  -s, --stop-at <STOP_AT>              Stop comparisons once the cropped chunk is this size (default = maximum size before chunk touches full image edge)
   -h, --help                           Print help
   -V, --version                        Print version
 ```
